@@ -38,6 +38,7 @@ import java.util.List;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.PermissionChecker;
+import org.apache.cordova.PermissionHelper;
 
 public class BluetoothPrinter extends CordovaPlugin {
 
@@ -94,14 +95,7 @@ public class BluetoothPrinter extends CordovaPlugin {
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if (action.equals("status")) {
-	        if (PermissionChecker.checkSelfPermission(this.cordova.getContext(), android.Manifest.permission.BLUETOOTH_SCAN) != PermissionChecker.PERMISSION_GRANTED) {  
-                ActivityCompat.requestPermissions(
-                    this.cordova.getActivity(),    
-                    new String[] { android.Manifest.permission.BLUETOOTH_SCAN, android.Manifest.permission.BLUETOOTH_CONNECT },
-                    REQUEST_BLUETOOTH_PERMISSION
-                );
-            }
-            checkBTStatus(callbackContext);
+            checkAndRequestBluetoothPermission(callbackContext);
             return true;
         } else if (action.equals("list")) {
             listBT(callbackContext);
@@ -222,6 +216,49 @@ public class BluetoothPrinter extends CordovaPlugin {
             return true;
 		}
         return false;
+    }
+
+    private void checkAndRequestBluetoothPermission(CallbackContext callbackContext) {
+        // Verificar si ya tenemos los permisos necesarios
+        if (!PermissionHelper.hasPermission(this, Manifest.permission.BLUETOOTH_SCAN) ||
+            !PermissionHelper.hasPermission(this, Manifest.permission.BLUETOOTH_CONNECT)) {
+
+            // Solicitar los permisos si no se tienen
+            PermissionHelper.requestPermissions(
+                this,
+                REQUEST_BLUETOOTH_PERMISSION,
+                new String[] {
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                }
+            );
+        } else {
+            // Si ya se tienen permisos, proceder con la lógica de Bluetooth
+            checkBTStatus(callbackContext);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+        if (requestCode == REQUEST_BLUETOOTH_PERMISSION) {
+            boolean allGranted = true;
+
+            // Comprobar si todos los permisos solicitados fueron otorgados
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+
+            // Si se otorgaron todos los permisos, ejecutar la función de Bluetooth
+            if (allGranted) {
+                checkBTStatus(callbackContext);
+            } else {
+                // Manejar el caso donde el usuario deniega los permisos
+                callbackContext.error("Bluetooth permissions denied.");
+            }
+        }
     }
 
     // This will return the status of BT adapter: true or false
