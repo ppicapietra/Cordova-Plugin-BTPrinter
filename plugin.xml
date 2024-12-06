@@ -2,16 +2,16 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-btprinter"
-        version="0.1.0-dev">
+        version="1.0.0">
 
    <name>BTPrinter</name>
    <description>A cordova plugin for bluetooth printer for android platform.</description>
 
-   <repo>https://github.com/CesarBalzer/Cordova-Plugin-BTPrinter</repo>
+   <repo>https://github.com/ppicapietra/Cordova-Plugin-BTPrinter</repo>
    <license>Apache 2.0</license>
    <keywords>cordova, bluetooth, printer, pos, text, barcode, image, base64, qrcode</keywords>
 
-   <author>Cesar E. Balzer</author>
+   <author>Pablo Picapietra</author>
 
    <!-- cordova -->
    <engines>

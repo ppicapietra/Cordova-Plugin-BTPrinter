@@ -89,6 +89,8 @@ public class BluetoothPrinter extends CordovaPlugin {
 	public static final byte[] BARCODE_ITF = { 0x1D, 0x6B, 0x05 };
 	public static final byte[] BARCODE_CODABAR = { 0x1D, 0x6B, 0x06 };
 
+    public static final int DEFAULT_PAPER_WIDTH = 32;
+
     public static final int REQUEST_BLUETOOTH_PERMISSION = 1;
 
     @Override
@@ -157,7 +159,8 @@ public class BluetoothPrinter extends CordovaPlugin {
             try {
                 String msg = args.getString(0);
                 Integer align = Integer.parseInt(args.getString(1));
-                printBase64(callbackContext, msg, align);
+                Integer paperWidth = args.length() > 2 ? Integer.parseInt(args.getString(2)) : DEFAULT_PAPER_WIDTH; // Default to 32 if undefined
+                printBase64(callbackContext, msg, align, paperWidth);
             } catch (IOException e) {
                 Log.e(LOG_TAG, e.getMessage());
                 e.printStackTrace();
@@ -655,7 +658,7 @@ public class BluetoothPrinter extends CordovaPlugin {
     }
 
     // This will send data to bluetooth printer
-    boolean printBase64(CallbackContext callbackContext, String msg, Integer align) throws IOException {
+    boolean printBase64(CallbackContext callbackContext, String msg, Integer align, Integer paperWidth) throws IOException {
         try {
 
             final String encodedString = msg;
@@ -668,7 +671,7 @@ public class BluetoothPrinter extends CordovaPlugin {
             int mWidth = bitmap.getWidth();
             int mHeight = bitmap.getHeight();
 
-            bitmap = resizeImage(bitmap, 48 * 12, mHeight);
+            bitmap = resizeImage(bitmap, paperWidth * 12, mHeight);
 
             byte[] bt = decodeBitmapBase64(bitmap);
 

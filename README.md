@@ -180,7 +180,7 @@ BTPrinter.printBase64(function(data){
 },function(err){
     console.log("Error");
     console.log(err);
-}, "Image Base64 String",'0');//base64 string, align
+}, "Image Base64 String",'0', 32);//base64 string, align, paper width (32 is the default and the param is optional)
 ```
 
 ### Print title with size and align
